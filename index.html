@@ -1,224 +1,866 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Detector ESP32</title>
+<title>Detector ESP32</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
 
-    body {
-      background: #0b1220;
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
 
-    .app {
-      max-width: 430px;
-      margin: auto;
-    }
+body {
+  background: #0b1220;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+}
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 25px;
-    }
+.app {
+  max-width: 430px;
+  margin: auto;
+}
 
-    .title {
-      font-size: 23px;
-      font-weight: bold;
-    }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
 
-    .subtitle {
-      color: #94a3b8;
-      font-size: 13px;
-      margin-top: 4px;
-    }
+.title {
+  font-size: 23px;
+  font-weight: bold;
+}
 
-    .status {
-      background: #123b2a;
-      border: 1px solid #1f9d61;
-      color: #4ade80;
-      padding: 7px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-    }
+.subtitle {
+  color: #94a3b8;
+  font-size: 13px;
+  margin-top: 4px;
+}
 
-    .card {
-      background: #111b2e;
-      border: 1px solid #26344d;
-      border-radius: 22px;
-      padding: 25px;
-      margin-bottom: 18px;
-      box-shadow: 0 15px 40px rgba(0,0,0,.25);
-    }
+.status {
+  background: #123b2a;
+  border: 1px solid #1f9d61;
+  color: #4ade80;
+  padding: 7px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
 
-    .system-icon {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: #123b2a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 45px;
-      margin: 0 auto 18px;
-    }
+.card {
+  background: #111b2e;
+  border: 1px solid #26344d;
+  border-radius: 22px;
+  padding: 25px;
+  margin-bottom: 18px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.25);
+}
 
-    .normal {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-    }
+.system-icon {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #123b2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+  margin: 0 auto 18px;
+}
 
-    .normal-text {
-      text-align: center;
-      color: #94a3b8;
-      margin-top: 8px;
-      font-size: 14px;
-    }
+.normal {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
 
-    .buttons {
-      display: grid;
-      gap: 12px;
-      margin-top: 20px;
-    }
+.normal-text {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 8px;
+  font-size: 14px;
+}
 
-    button {
-      border: none;
-      border-radius: 14px;
-      padding: 16px;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.buttons {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
 
-    .fire {
-      background: #dc2626;
-    }
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .gas {
-      background: #ea580c;
-    }
+.fire {
+  background: #dc2626;
+}
 
-    .reset {
-      background: #334155;
-    }
+.gas {
+  background: #ea580c;
+}
 
-    button:active {
-      transform: scale(.98);
-    }
+.reset {
+  background: #334155;
+}
 
-    .section-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
+button:active {
+  transform: scale(.98);
+}
 
-    .event {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #26344d;
-    }
+.alert {
+  background: #3b1116;
+  border-color: #ef4444;
+}
 
-    .event:last-child {
-      border-bottom: none;
-    }
+.alert-icon {
+  background: #5c151b;
+}
 
-    .event-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #26344d;
-      font-size: 20px;
-    }
+.alert-title {
+  color: #f87171;
+}
 
-    .event-name {
-      font-weight: bold;
-      font-size: 14px;
-    }
+.pulse {
+  animation: pulse 1s infinite;
+}
 
-    .event-time {
-      color: #64748b;
-      font-size: 12px;
-      margin-top: 3px;
-    }
+@keyframes pulse {
 
-    .footer {
-      text-align: center;
-      color: #64748b;
-      font-size: 11px;
-      margin-top: 25px;
-    }
+  0% {
+    transform: scale(1);
+  }
 
-    .alert {
-      background: #3b1116;
-      border-color: #ef4444;
-    }
+  50% {
+    transform: scale(1.08);
+  }
 
-    .alert-icon {
-      background: #5c151b;
-    }
+  100% {
+    transform: scale(1);
+  }
 
-    .alert-title {
-      color: #f87171;
-    }
-  </style>
+}
+
+
+/* NOTIFICAÇÃO */
+
+.notification {
+  display: none;
+  margin-bottom: 18px;
+}
+
+.notification.show {
+  display: block;
+  animation: aparecer .5s ease;
+}
+
+@keyframes aparecer {
+
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* CELULAR DO RESPONSÁVEL */
+
+.phone {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0,0,0,.35);
+}
+
+.phone-header {
+  background: #075e54;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.contact-name {
+  font-weight: bold;
+}
+
+.contact-status {
+  font-size: 11px;
+  color: #d1fae5;
+  margin-top: 3px;
+}
+
+.chat {
+  background: #0f172a;
+  padding: 18px;
+  min-height: 260px;
+}
+
+.system-message {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 11px;
+  margin-bottom: 15px;
+}
+
+.message {
+  background: #1f2937;
+  border-radius: 5px 15px 15px 15px;
+  padding: 15px;
+  max-width: 90%;
+  margin-bottom: 10px;
+  animation: mensagem .7s ease;
+}
+
+@keyframes mensagem {
+
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+.message-title {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message-time {
+  text-align: right;
+  color: #94a3b8;
+  font-size: 10px;
+  margin-top: 8px;
+}
+
+.check {
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+.sending {
+  color: #facc15;
+  text-align: center;
+  font-size: 13px;
+  padding: 12px;
+}
+
+.sent {
+  color: #4ade80;
+  text-align: center;
+  font-size: 13px;
+  padding: 12px;
+  font-weight: bold;
+}
+
+
+/* HISTÓRICO */
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #26344d;
+}
+
+.event:last-child {
+  border-bottom: none;
+}
+
+.event-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #26344d;
+  font-size: 20px;
+}
+
+.event-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.event-time {
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.footer {
+  text-align: center;
+  color: #64748b;
+  font-size: 11px;
+  margin-top: 25px;
+}
+
+</style>
 </head>
+
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <div class="header">
-      <div>
-        <div class="title">Detector ESP32</div>
-        <div class="subtitle">Monitoramento inteligente</div>
-      </div>
 
-      <div class="status" id="connection">
-        ● ONLINE
-      </div>
+<!-- CABEÇALHO -->
+
+<div class="header">
+
+  <div>
+
+    <div class="title">
+      Detector ESP32
     </div>
 
-    <div class="card" id="mainCard">
+    <div class="subtitle">
+      Monitoramento inteligente
+    </div>
 
-      <div class="system-icon" id="mainIcon">
-        🛡️
+  </div>
+
+  <div class="status">
+    ● ONLINE
+  </div>
+
+</div>
+
+
+<!-- STATUS -->
+
+<div class="card" id="mainCard">
+
+  <div class="system-icon" id="mainIcon">
+    🛡️
+  </div>
+
+  <div class="normal" id="mainTitle">
+    SISTEMA NORMAL
+  </div>
+
+  <div class="normal-text" id="mainText">
+    Nenhuma condição de alarme detectada.
+  </div>
+
+
+  <div class="buttons">
+
+    <button class="fire" onclick="simulateFire()">
+      🔥 Simular Detecção de Fogo
+    </button>
+
+    <button class="gas" onclick="simulateGas()">
+      💨 Simular Gás/Fumaça
+    </button>
+
+    <button class="reset" onclick="resetSystem()">
+      ✓ Voltar ao Normal
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- MENSAGEM PARA RESPONSÁVEL -->
+
+<div class="notification" id="notification">
+
+  <div class="phone">
+
+
+    <div class="phone-header">
+
+      <div class="profile">
+        🚨
       </div>
 
-      <div class="normal" id="mainTitle">
-        SISTEMA NORMAL
+      <div>
+
+        <div class="contact-name">
+          Detector ESP32
+        </div>
+
+        <div class="contact-status">
+          sistema de segurança
+        </div>
+
       </div>
 
-      <div class="normal-text" id="mainText">
-        Nenhuma condição de alarme detectada.
+    </div>
+
+
+    <div class="chat">
+
+      <div class="system-message">
+        ALERTA AUTOMÁTICO
       </div>
 
-      <div class="buttons">
 
-        <button class="fire" onclick="simulateFire()">
-          🔥 Simular Fogo
-        </button>
+      <div id="sending" class="sending">
+        📡 Enviando mensagem ao responsável...
+      </div>
 
-        <button class="gas" onclick="simulateGas()">
-          💨 Simular Gás/Fumaça
-        </button>
 
-        <button class="reset" onclick="resetSystem()">
-          ✓ Vol
+      <div
+        class="message"
+        id="message"
+        style="display:none;"
+      >
+
+        <div
+          class="message-title"
+          id="messageTitle"
+        >
+          🚨 ALERTA AUTOMÁTICO
+        </div>
+
+
+        <div
+          class="message-text"
+          id="messageText"
+        >
+        </div>
+
+
+        <div
+          class="message-time"
+          id="messageTime"
+        >
+        </div>
+
+      </div>
+
+
+      <div
+        id="sent"
+        class="sent"
+        style="display:none;"
+      >
+        ✓✓ Mensagem entregue ao responsável
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- HISTÓRICO -->
+
+<div class="card">
+
+  <div class="section-title">
+    Últimos eventos
+  </div>
+
+  <div id="events">
+
+    <div class="event">
+
+      <div class="event-icon">
+        ✓
+      </div>
+
+      <div>
+
+        <div class="event-name">
+          Sistema iniciado
+        </div>
+
+        <div class="event-time">
+          Agora
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="footer">
+  ESP32 • Detector de Gás e Fogo
+</div>
+
+
+</div>
+
+
+<script>
+
+
+function getTime() {
+
+  const now = new Date();
+
+  return now.toLocaleTimeString(
+    'pt-BR',
+    {
+      hour: '2-digit',
+      minute: '2-digit'
+    }
+  );
+
+}
+
+
+function addEvent(icon, name) {
+
+  const events =
+    document.getElementById("events");
+
+  const event =
+    document.createElement("div");
+
+  event.className = "event";
+
+  event.innerHTML = `
+
+    <div class="event-icon">
+      ${icon}
+    </div>
+
+    <div>
+
+      <div class="event-name">
+        ${name}
+      </div>
+
+      <div class="event-time">
+        ${getTime()}
+      </div>
+
+    </div>
+
+  `;
+
+  events.prepend(event);
+
+}
+
+
+function showMessage(type) {
+
+  const notification =
+    document.getElementById("notification");
+
+  const sending =
+    document.getElementById("sending");
+
+  const message =
+    document.getElementById("message");
+
+  const messageText =
+    document.getElementById("messageText");
+
+  const sent =
+    document.getElementById("sent");
+
+  const time =
+    document.getElementById("messageTime");
+
+
+  notification.classList.add("show");
+
+  message.style.display = "none";
+
+  sent.style.display = "none";
+
+  sending.style.display = "block";
+
+
+  setTimeout(function() {
+
+    sending.style.display = "none";
+
+    message.style.display = "block";
+
+
+    if (type === "fire") {
+
+      messageText.innerHTML = `
+
+        🔥 <strong>FOGO DETECTADO!</strong>
+
+        <br><br>
+
+        O sensor de chama identificou
+        uma possível presença de fogo
+        no local monitorado.
+
+        <br><br>
+
+        📍 <strong>Local:</strong>
+        Área monitorada
+
+        <br>
+
+        ⚠️ <strong>Verifique o local
+        imediatamente.</strong>
+
+      `;
+
+    }
+
+
+    if (type === "gas") {
+
+      messageText.innerHTML = `
+
+        💨 <strong>GÁS/FUMAÇA DETECTADO!</strong>
+
+        <br><br>
+
+        O sensor MQ-2 identificou
+        uma possível presença de
+        gás ou fumaça no local.
+
+        <br><br>
+
+        📍 <strong>Local:</strong>
+        Área monitorada
+
+        <br>
+
+        ⚠️ <strong>Verifique o local
+        imediatamente.</strong>
+
+      `;
+
+    }
+
+
+    time.innerHTML =
+      getTime() +
+      ' &nbsp; <span class="check">✓✓</span>';
+
+
+    setTimeout(function() {
+
+      sent.style.display = "block";
+
+    }, 500);
+
+
+  }, 1800);
+
+}
+
+
+function simulateFire() {
+
+  const card =
+    document.getElementById("mainCard");
+
+  const icon =
+    document.getElementById("mainIcon");
+
+  const title =
+    document.getElementById("mainTitle");
+
+  const text =
+    document.getElementById("mainText");
+
+
+  card.classList.add("alert");
+
+  icon.className =
+    "system-icon alert-icon pulse";
+
+  icon.innerHTML =
+    "🔥";
+
+
+  title.className =
+    "normal alert-title";
+
+  title.innerHTML =
+    "FOGO DETECTADO";
+
+
+  text.innerHTML =
+    "⚠️ Sensor de chama acionado!";
+
+
+  addEvent(
+    "🔥",
+    "Fogo detectado"
+  );
+
+
+  if (navigator.vibrate) {
+
+    navigator.vibrate(
+      [300,150,300,150,500]
+    );
+
+  }
+
+
+  showMessage("fire");
+
+}
+
+
+function simulateGas() {
+
+  const card =
+    document.getElementById("mainCard");
+
+  const icon =
+    document.getElementById("mainIcon");
+
+  const title =
+    document.getElementById("mainTitle");
+
+  const text =
+    document.getElementById("mainText");
+
+
+  card.classList.add("alert");
+
+  icon.className =
+    "system-icon alert-icon pulse";
+
+  icon.innerHTML =
+    "💨";
+
+
+  title.className =
+    "normal alert-title";
+
+  title.innerHTML =
+    "GÁS/FUMAÇA DETECTADO";
+
+
+  text.innerHTML =
+    "⚠️ Sensor MQ-2 acionado!";
+
+
+  addEvent(
+    "💨",
+    "Gás/Fumaça detectado"
+  );
+
+
+  if (navigator.vibrate) {
+
+    navigator.vibrate(
+      [300,150,300]
+    );
+
+  }
+
+
+  showMessage("gas");
+
+}
+
+
+function resetSystem() {
+
+  const card =
+    document.getElementById("mainCard");
+
+  const icon =
+    document.getElementById("mainIcon");
+
+  const title =
+    document.getElementById("mainTitle");
+
+  const text =
+    document.getElementById("mainText");
+
+  const notification =
+    document.getElementById("notification");
+
+
+  card.classList.remove("alert");
+
+  icon.className =
+    "system-icon";
+
+  icon.innerHTML =
+    "🛡️";
+
+
+  title.className =
+    "normal";
+
+  title.innerHTML =
+    "SISTEMA NORMAL";
+
+
+  text.innerHTML =
+    "Nenhuma condição de alarme detectada.";
+
+
+  notification.classList.remove("show");
+
+
+  addEvent(
+    "✓",
+    "Sistema voltou ao normal"
+  );
+
+}
+
+
+</script>
+
+</body>
+</html>
