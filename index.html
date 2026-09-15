@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Detector ESP32</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0b1220;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .title {
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .status {
+      background: #123b2a;
+      border: 1px solid #1f9d61;
+      color: #4ade80;
+      padding: 7px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .card {
+      background: #111b2e;
+      border: 1px solid #26344d;
+      border-radius: 22px;
+      padding: 25px;
+      margin-bottom: 18px;
+      box-shadow: 0 15px 40px rgba(0,0,0,.25);
+    }
+
+    .system-icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #123b2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 45px;
+      margin: 0 auto 18px;
+    }
+
+    .normal {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .normal-text {
+      text-align: center;
+      color: #94a3b8;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .buttons {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .fire {
+      background: #dc2626;
+    }
+
+    .gas {
+      background: #ea580c;
+    }
+
+    .reset {
+      background: #334155;
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .event {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #26344d;
+    }
+
+    .event:last-child {
+      border-bottom: none;
+    }
+
+    .event-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #26344d;
+      font-size: 20px;
+    }
+
+    .event-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .event-time {
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 11px;
+      margin-top: 25px;
+    }
+
+    .alert {
+      background: #3b1116;
+      border-color: #ef4444;
+    }
+
+    .alert-icon {
+      background: #5c151b;
+    }
+
+    .alert-title {
+      color: #f87171;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div class="header">
+      <div>
+        <div class="title">Detector ESP32</div>
+        <div class="subtitle">Monitoramento inteligente</div>
+      </div>
+
+      <div class="status" id="connection">
+        ● ONLINE
+      </div>
+    </div>
+
+    <div class="card" id="mainCard">
+
+      <div class="system-icon" id="mainIcon">
+        🛡️
+      </div>
+
+      <div class="normal" id="mainTitle">
+        SISTEMA NORMAL
+      </div>
+
+      <div class="normal-text" id="mainText">
+        Nenhuma condição de alarme detectada.
+      </div>
+
+      <div class="buttons">
+
+        <button class="fire" onclick="simulateFire()">
+          🔥 Simular Fogo
+        </button>
+
+        <button class="gas" onclick="simulateGas()">
+          💨 Simular Gás/Fumaça
+        </button>
+
+        <button class="reset" onclick="resetSystem()">
+          ✓ Vol
